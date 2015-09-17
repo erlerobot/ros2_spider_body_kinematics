@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(spider_body_kinematics)
 
-#if(NOT WIN32)
+if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -Wall -Wdeprecated-declarations")
 #  set(CEF_C_COMPILER_FLAGS  -Wno-narrowing)
-#endif()
+endif()
 
-#anita
 set(ROS_BUILD_TYPE Debug)
-#anita
 
 ##############
 ## Packages ##
 ##############
+
+### ROS 1 ###
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -25,6 +25,9 @@ set(ROS_BUILD_TYPE Debug)
 #  std_msgs
 #)
 
+### ROS 2 ###
+
+#find_package(orocos_kdl)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -43,6 +46,8 @@ find_package(rmw_implementation REQUIRED)#CMake infrastructure and dependencies 
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
+
+### ROS 1 ### EVERYTHING COMMENTED
 
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
@@ -127,6 +132,8 @@ set(target_dependencies
 ## Build ##
 ###########
 
+### ROS 1 ###
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
@@ -135,15 +142,8 @@ set(target_dependencies
 ## Declare a cpp executable
 ##add_executable(rpy_body_kinematics src/rpy_body_kinematics.cpp)
 ##target_link_libraries(rpy_body_kinematics ${catkin_LIBRARIES})
-
 #add_executable(body_kinematics src/body_kinematics.cpp)
-
-add_executable_for_each_rmw_implementations(body_kinematics src/body_kinematics.cpp
-	TARGET_DEPENDENCIES ${target_dependencies} INSTALL)
-
 #target_link_libraries(body_kinematics ${catkin_LIBRARIES})
-
-target_link_libraries(body_kinematics ${ament_LIBRARIES})
 
 #install(
 #	TARGETS body_kinematics
@@ -151,4 +151,18 @@ target_link_libraries(body_kinematics ${ament_LIBRARIES})
 #	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)
+
+### ROS 2 ###
+
+add_executable_for_each_rmw_implementations(body_kinematics src/body_kinematics.cpp
+	TARGET_DEPENDENCIES ${target_dependencies} INSTALL)
+
+target_link_libraries(body_kinematics ${ament_LIBRARIES})
+
+install(
+	TARGETS body_kinematics
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
 
