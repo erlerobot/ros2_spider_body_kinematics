@@ -8,52 +8,59 @@ const static std::string suffixes[6] = {"_r1", "_r2", "_r3", "_l1", "_l2", "_l3"
 bool BodyKinematics::init() {
 	std::string robot_desc_string;
 	// Get URDF XML
-/*	if (!node.getParam("robot_description", robot_desc_string)) {
-		   ROS_FATAL("Could not load the xml from parameter: robot_description");
-		   return false;
-	   }
+	//if (!node.getParam("robot_description", robot_desc_string)) {
+	//	   ROS_FATAL("Could not load the xml from parameter: robot_description");
+	//	   return false;
+	//   }
 
 	// Get Root and Tip From Parameter Server
-	node.param("root_name_body", root_name, std::string("leg_center"));
-	node.param("tip_name_body", tip_name, std::string("coxa"));
-	node.param("clearance", z, 0.045);
+	//node.param("root_name_body", root_name, std::string("leg_center"));
+	//node.param("tip_name_body", tip_name, std::string("coxa"));
+	//node.param("clearance", z, 0.045);
 
 	// Load and Read Models
 	if (!loadModel(robot_desc_string)) {
-		ROS_FATAL("Could not load models!");
+	//	ROS_FATAL("Could not load models!");
 		return false;
 	}
 
-	client = node.serviceClient<spider_msgs::GetLegIKSolver>("/spider_leg_kinematics/get_ik");
-	joints_pub = node.advertise<spider_msgs::LegsJointsState>("joints_to_controller", 1);
-	body_move_sub = node.subscribe<spider_msgs::BodyState>("/teleop/move_body", 1, &BodyKinematics::teleopBodyMove, this);
-	body_cmd_sub = node.subscribe<spider_msgs::BodyCommand>("/teleop/body_command", 1, &BodyKinematics::teleopBodyCmd, this);
+	//client = node.serviceClient<spider_msgs::GetLegIKSolver>("/spider_leg_kinematics/get_ik");
+	//auto client = node->create_client<spider_msgs::srv::GetLegIKSolver>("/spider_leg_kinematics/get_ik");
+	//joints_pub = node.advertise<spider_msgs::LegsJointsState>("joints_to_controller", 1);
+	//auto joints_pub = node->create_publisher<spider_msgs::msg::LegsJointsState>("joints_to_controller", rmw_qos_profile_default);
+	//body_move_sub = node.subscribe<spider_msgs::BodyState>("/teleop/move_body", 1, &BodyKinematics::teleopBodyMove, this);
+	//auto body_move_sub = node->create_subscription<spider_msgs::msg::BodyState>("/teleop/move_body", rmw_qos_profile_default, &BodyKinematics::teleopBodyMove, this);
+	//body_cmd_sub = node.subscribe<spider_msgs::BodyCommand>("/teleop/body_command", 1, &BodyKinematics::teleopBodyCmd, this);
+	//auto body_cmd_sub = node->create_subscription<spider_msgs::msg::BodyCommand>("/teleop/body_command", rmw_qos_profile_default, &BodyKinematics::teleopBodyCmd, this);
 
 	bs.leg_radius = 0.11;
 	bs.z = -0.016;
-	ros::Duration(1).sleep();
+	//ros::Duration(1).sleep();
 	if (calculateKinematics(&bs)){
-			joints_pub.publish(legs);
+	//		joints_pub.publish(legs);
+		//joints_pub->publish(legs);
 	}
-	ROS_INFO("Ready to receive teleop messages... ");
+	//ROS_INFO("Ready to receive teleop messages... "); 
+	printf("%s\n","Ready to receive teleop messages... ");
 
-	return true; */
+	return true; 
 }
 
 bool BodyKinematics::loadModel(const std::string xml){
 	//Construct tree with kdl_parser
-/*	KDL::Tree tree;
+//	KDL::Tree tree;
 
-	if (!kdl_parser::treeFromString(xml, tree)) {
+/*	if (!kdl_parser::treeFromString(xml, tree)) {
 		ROS_ERROR("Could not initialize tree object");
 		return false;
-	}
-	ROS_INFO("Construct tree");
+	}*/
+	//ROS_INFO("Construct tree");
+	printf("%s\n","Construct tree");
 
 	//Get coxa and leg_center frames via segments (for calculating vectors)
-	std::map<std::string,KDL::TreeElement>::const_iterator segments_iter;
+	//std::map<std::string,KDL::TreeElement>::const_iterator segments_iter;
 	std::string link_name_result;
-	for (int i=0; i<num_legs; i++){
+	/*for (int i=0; i<num_legs; i++){
 		link_name_result = root_name + suffixes[i];
 		segments_iter = tree.getSegment(link_name_result);
 		frames.push_back((*segments_iter).second.segment.getFrameToTip());
@@ -62,11 +69,11 @@ bool BodyKinematics::loadModel(const std::string xml){
 		link_name_result = tip_name + suffixes[i];
 		segments_iter = tree.getSegment(link_name_result);
 		frames.push_back((*segments_iter).second.segment.getFrameToTip());
-	}
-	ROS_INFO("Get frames");
-
+	}*/
+	//ROS_INFO("Get frames");
+    printf("%s\n","Get frames");
 	//Vector iterators
-	for (int i=0; i<num_legs; i++){
+	/*for (int i=0; i<num_legs; i++){
 		frames[i] = frames[i] * frames[i+num_legs];
 	}
 	frames.resize(num_legs);
@@ -75,12 +82,13 @@ bool BodyKinematics::loadModel(const std::string xml){
 		for (int j = 0; j < num_joints; j++) {
 			legs.joints_state[i].joint[j] = 0;
 		}
-	}
+	} */
 
-	return true; */
+	return true; 
 }
 
-bool BodyKinematics::calculateKinematics (spider_msgs::BodyState* body_ptr){
+//bool BodyKinematics::calculateKinematics (spider_msgs::BodyState* body_ptr){
+bool BodyKinematics::calculateKinematics (spider_msgs::msg::BodyState* body_ptr){
 
 	//Body rotation
 	//rotation = KDL::Rotation::RPY(body_ptr->roll,body_ptr->pitch,body_ptr->yaw);
@@ -92,22 +100,23 @@ bool BodyKinematics::calculateKinematics (spider_msgs::BodyState* body_ptr){
 	//offset_vector = KDL::Vector (body_ptr->x,body_ptr->y,body_ptr->z);
 	//rotate_correction = KDL::Vector (body_ptr->z * tan(body_ptr->pitch), -(body_ptr->z * tan(body_ptr->roll)), 0);
 
-	for (int i=0; i<num_legs; i++){
+	/*for (int i=0; i<num_legs; i++){
 		//Get tip frames
 		tibia_foot_frame = frames[i] * femur_frame;
 		//Get tip vectors with body position
 		final_vector[i] = (rotation * tibia_foot_frame.p) + offset_vector + rotate_correction;
 //		ROS_DEBUG("Position vector leg%s\tx: %f\ty: %f\tz: %f", suffixes[i].c_str(),
 //							final_vector[i](0),final_vector[i](1),final_vector[i](2));
-	}
+	}  */
 
 //	ROS_DEBUG("Call service: /leg_ik_service/get_ik");
+	printf("%s\n","Call service: /leg_ik_service/get_ik");
 /*	if (!callService(final_vector)){
 		return 0;
-	}
+	} */
 
-	return true; */
-}
+	return true; 
+}  
 
 /*bool BodyKinematics::callService (KDL::Vector* vector){
 	spider_msgs::LegPositionState leg_pos_buf;
@@ -146,11 +155,12 @@ bool BodyKinematics::calculateKinematics (spider_msgs::BodyState* body_ptr){
 		ROS_ERROR("Failed to call service");
 		return 0;
 	}
-	return true;
+	return true; 
 }  */
 
 
-void BodyKinematics::teleopBodyMove(const spider_msgs::BodyStateConstPtr &body_state){
+ //void BodyKinematics::teleopBodyMove(const spider_msgs::BodyStateConstPtr &body_state){
+ void BodyKinematics::teleopBodyMove(const spider_msgs::msg::BodyState::SharedPtr &body_state){
 	bs.x = body_state->x;
 	bs.y = body_state->y;
 	bs.z = body_state->z;
@@ -159,19 +169,22 @@ void BodyKinematics::teleopBodyMove(const spider_msgs::BodyStateConstPtr &body_s
 	bs.yaw = body_state->yaw;
 	bs.leg_radius = body_state->leg_radius;
 	if (calculateKinematics(&bs)){
-		joints_pub.publish(legs);
+		//joints_pub.publish(legs);
+		//joints_pub->publish(legs);
 	}
-}
+}  
 
-void BodyKinematics::teleopBodyCmd(const spider_msgs::BodyCommandConstPtr &body_cmd){
+ //void BodyKinematics::teleopBodyCmd(const spider_msgs::BodyCommandConstPtr &body_cmd){
+void BodyKinematics::teleopBodyCmd(const spider_msgs::msg::BodyCommand::SharedPtr &body_cmd){
 	if (body_cmd->cmd == body_cmd->STAND_UP_CMD){
 //		ROS_ERROR("STAND_UP_CMD");
 	//	ros::Rate r(25);
+		rclcpp::rate::Rate loop_rate(25);
 		while (bs.z >= -z){
 		  bs.z -= 0.0025;
-		  r.sleep();
+		  //r.sleep();
 		  if (calculateKinematics(&bs)){
-				joints_pub.publish(legs);
+				//joints_pub.publish(legs);
 		  }
 		}
 	}
@@ -180,24 +193,24 @@ void BodyKinematics::teleopBodyCmd(const spider_msgs::BodyCommandConstPtr &body_
 	//	ros::Rate r(25);
 		while (bs.z <= -0.016){
 		  bs.z += 0.0025;
-		  r.sleep();
+		  //r.sleep();
 		  if (calculateKinematics(&bs)){
-				joints_pub.publish(legs);
+				//joints_pub.publish(legs);
 		  }
 		}
 	}
-//	if (body_cmd->cmd == body_cmd->IMU_START_CMD){
+	if (body_cmd->cmd == body_cmd->IMU_START_CMD){
 //			ROS_ERROR("IMU_START_CMD");
 //			ros::Rate r(25);
-//			while (bs.z >= -0.08){
-//			  bs.z -= 0.0025;
+			while (bs.z >= -0.08){
+			  bs.z -= 0.0025;
 //			  r.sleep();
-//			  if (calculateKinematics(&bs)){
+			  if (calculateKinematics(&bs)){
 //					joints_pub.publish(legs);
-//			  }
-//			}
-//		}
-}
+			  }
+			}
+		}
+} 
 
 int main(int argc, char **argv)
 {	
@@ -206,12 +219,13 @@ int main(int argc, char **argv)
 	rclcpp::init(argc, argv);
 	auto node = rclcpp::Node::make_shared("body_kinematics"); 
 	BodyKinematics k;
-  /*  if (k.init()<0) {
-        ROS_ERROR("Could not initialize kinematics node");
+    if (k.init()<0) {
+       // ROS_ERROR("Could not initialize kinematics node");
+    	printf("%s\n","Could not initialize kinematics node");
         return -1;
-    } */
+    } 
 
     //ros::spin();
-    ros::spin(node);
+    rclcpp::spin(node);
     return 0;
 }

@@ -27,7 +27,7 @@ set(ROS_BUILD_TYPE Debug)
 
 ### ROS 2 ###
 
-#find_package(orocos_kdl)
+find_package(orocos_kdl)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -126,6 +126,7 @@ ament_package()
 set(target_dependencies
   "rclcpp"
   "std_msgs"
+  "orocos_kdl"
   )
 
 ###########
